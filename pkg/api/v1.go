@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Routes for all v1 api request
 func Routes() {
 	var server = gin.New()
 	v1 := server.Group("/api/v1")

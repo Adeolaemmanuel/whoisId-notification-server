@@ -14,7 +14,8 @@ type FcmPayload struct {
 	Token []string `json:"token"`
 }
 
-
+// Handler called to handle fcm messaging
+// for both single and multiple broadcast
 func FcmHandler(ctx *gin.Context) {
 	var payload FcmPayload
 
