@@ -9,8 +9,9 @@ import (
 // Routes for all v1 api request
 func Routes() {
 	var server = gin.New()
-	v1 := server.Group("/api/v1")
+	server.Use(gin.Recovery())
 
+	v1 := server.Group("/api/v1")
 	notification.Notification(v1)
 
 	server.Run(":4000")
