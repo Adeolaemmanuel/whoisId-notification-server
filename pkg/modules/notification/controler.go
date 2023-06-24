@@ -2,6 +2,7 @@ package notification
 
 import (
 	"context"
+	"fmt"
 	"whosId-notification/pkg/internals"
 
 	"firebase.google.com/go/messaging"
@@ -19,11 +20,21 @@ type FcmPayload struct {
 func FcmHandler(ctx *gin.Context) {
 	var payload FcmPayload
 
+	fmt.Print(ctx.Request.Host)
+
 	if ctx.ShouldBindJSON(&payload) == nil {
 		app := internals.Messaging()
 
-		if len(payload.Token) == 1 {
-			_, err :=app.Send(context.Background(), &messaging.Message{
+		if len(payload.Token) == 0 {
+
+			ctx.JSON(400, gin.H{
+				"message": "Error sending push notification",
+				"error": "Token contains an empty array",
+			})
+
+		} else if len(payload.Token) == 1 {
+
+			_, err := app.Send(context.Background(), &messaging.Message{
 				Notification: &messaging.Notification{
 					Title: payload.Title,
 					Body: payload.Body,
@@ -37,9 +48,9 @@ func FcmHandler(ctx *gin.Context) {
 					"error": err,
 				})
 			}
-		}
 
-		if len(payload.Token) > 1 {
+		} else {
+
 			_, err := app.SendMulticast(context.Background(), &messaging.MulticastMessage{
 				Tokens: payload.Token,
 				Notification: &messaging.Notification{
@@ -54,11 +65,13 @@ func FcmHandler(ctx *gin.Context) {
 					"error": err,
 				})
 			}
+
 		}
 
 		ctx.JSON(200, gin.H{
 			"message": "Fcm notification sent successfully",
 			"data": payload,
 		})
+		
 	}
 }
